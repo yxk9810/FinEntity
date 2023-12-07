@@ -101,7 +101,7 @@ def valid_epoch(e,model, data_loader,device,label_set):
     print(report)
     valid_loss = losses/all_step 
     print("Epoch: {}, train Loss:{:.4f}".format((e+1), valid_loss))
-    return valid_loss
+    return report
 
         
 def valid_epoch_not_crf(e,model, val_loader,device,label_set):

@@ -66,6 +66,7 @@ def valid_epoch(e,model, data_loader,device,label_set):
     model.eval()
     y_true, y_pred = [], []
     losses = 0
+    all_step = 0 
     with torch.no_grad():
         for step, d in enumerate(data_loader):
             y_true_sub, y_pred_sub = [], []
@@ -81,6 +82,7 @@ def valid_epoch(e,model, data_loader,device,label_set):
                 **val_input
             )
             tmp_eval_loss, logits = outputs[:2]
+            losses+=tmp_eval_loss.item()
             tags = model.crf.decode(logits, d['attention_masks'].to(device))
             tags = tags.squeeze(0).cpu().numpy().tolist()
             out_label_ids = d['labels'].cpu().numpy().tolist()
@@ -94,9 +96,13 @@ def valid_epoch(e,model, data_loader,device,label_set):
                     temp_2.append(label_set.ids_to_label[tags[i][j]])
                 y_true.append(temp_1)
                 y_pred.append(temp_2)
+            all_step+=1 
     report=classification_report(y_true, y_pred, mode='strict', scheme=BILOU)
     print(report)
-    
+    valid_loss = losses/all_step 
+    print("Epoch: {}, train Loss:{:.4f}".format((e+1), valid_loss))
+    return valid_loss
+
         
 def valid_epoch_not_crf(e,model, val_loader,device,label_set):
     model.eval()

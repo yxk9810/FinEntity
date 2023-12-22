@@ -308,13 +308,15 @@ def valid_epoch_span(e,model, val_loader,device,label_set):
             end_logits =   torch.argmax(end_logits, -1).cpu().numpy()
             start_ids = start_ids.cpu().numpy()
             end_ids = end_ids.cpu().numpy()
-            
+            pred_ents = []
+            gold_ents = []
             for tmp_start_logits, tmp_end_logits,start_ids,end_ids in zip(start_logits,end_logits,start_ids,end_ids):
-                print(tmp_start_logits)
-                print(tmp_end_logits)
-                print(start_ids)
-                print(end_ids)
-                sys.exit(1)
+
+                R = extract_item(start_logits,end_logits)
+                T = extract_item(start_ids,end_ids)
+                pred_ents.extend(R)
+                gold_ents.extend(T)
+                
             
     #         R = bert_extract_item(start_logits, end_logits)
     #         T = extract_item(start_ids,end_ids)
@@ -322,7 +324,7 @@ def valid_epoch_span(e,model, val_loader,device,label_set):
     #         print(T[:2])
             
     #         # sys.exit(1)
-    #         metric.update(true_subject=T, pred_subject=R)
+            metric.update(true_subject=gold_ents, pred_subject=pred_ents)
     #         losses+=tmp_eval_loss.item()
     #         # sub_preds =np.argmax(logits.cpu().numpy(), axis=2).reshape(-1).tolist()
     #         # #sub_trues = d["labels"].detach().cpu().numpy().reshape(-1).tolist()
@@ -334,8 +336,8 @@ def valid_epoch_span(e,model, val_loader,device,label_set):
     # # report=classification_report(trues, preds, mode='strict', scheme=BILOU)
     # # print(report)
     # print('train loss'+str(float(losses)/all_steps))
-    # eval_info, entity_info = metric.result()
-    # results = {f'{key}': value for key, value in eval_info.items()}
-    # print(results)
+    eval_info, entity_info = metric.result()
+    results = {f'{key}': value for key, value in eval_info.items()}
+    print(results)
 
 

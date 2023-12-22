@@ -271,10 +271,10 @@ def bert_extract_item(start_logits, end_logits):
     return S
 def extract_item(start_ids,end_ids):
     T = []
-    for i, s_l in enumerate(start_ids.cpu().numpy()[0][:-1]):
+    for i, s_l in enumerate(start_ids):
         if s_l == 0:
             continue
-        for j, e_l in enumerate(end_ids.cpu().numpy()[0][:-1]):
+        for j, e_l in enumerate(end_ids):
             if s_l == e_l:
                 T.append((s_l, i, i + j))
                 break

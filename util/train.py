@@ -257,4 +257,56 @@ def train_epoch_span(e, model, data_loader, optimizer, scheduler, device):
         optimizer.zero_grad()
     print("Epoch: {}, train Loss:{:.4f}".format((e + 1), losses / step))
     return losses / step
+def bert_extract_item(start_logits, end_logits):
+    S = []
+    start_pred = torch.argmax(start_logits, -1).cpu().numpy()[0][1:-1]
+    end_pred = torch.argmax(end_logits, -1).cpu().numpy()[0][1:-1]
+    for i, s_l in enumerate(start_pred):
+        if s_l == 0:
+            continue
+        for j, e_l in enumerate(end_pred[i:]):
+            if s_l == e_l:
+                S.append((s_l, i, i + j))
+                break
+    return S
+def extract_item(start_ids,end_ids):
+    T = []
+    for i, s_l in enumerate(start_ids):
+        if s_l == 0:
+            continue
+        for j, e_l in enumerate(end_ids[i:]):
+            if s_l == e_l:
+                T.append((s_l, i, i + j))
+                break
+    return T
+def valid_epoch_span(e,model, val_loader,device,label_set):
+    model.eval()
+    trues, preds = [], []
+    losses = 0
+    with torch.no_grad():
+        for step, d in enumerate(val_loader):
+            sub_preds, sub_trues = [],[]
+            input_ids = d["input_ids"]
+            attention_mask = d["attention_masks"].type(torch.uint8)
+            start_ids = d["start_ids"]
+            end_ids = d["end_ids"]
+            val_input = {
+                'input_ids':input_ids.to(device),
+                'attention_mask':attention_mask.to(device),
+                'start_ids': start_ids.to(device),
+                'end_ids': start_ids.to(device)
+            }
+            outputs = model(
+                **val_input
+            )
+            tmp_eval_loss, start_logits, end_logits = outputs[:3]            
+            sub_preds =np.argmax(logits.cpu().numpy(), axis=2).reshape(-1).tolist()
+            #sub_trues = d["labels"].detach().cpu().numpy().reshape(-1).tolist()
+            # data process
+            #gold_labeled,pred_labeled = ids_to_labels(label_set,sub_trues,sub_preds)
+            #trues.append(gold_labeled)
+            #preds.append(pred_labeled)
+    report=classification_report(trues, preds, mode='strict', scheme=BILOU)
+    print(report)
+
 

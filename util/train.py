@@ -327,13 +327,13 @@ def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):
                     for t_ids in T:
                         tokens = tmp_input_ids.tolist()[t_ids[1]:t_ids[2]+1]
                         text = tokenizer.decode(tokens)
-                        type =  id2label(t_ids[0])
+                        type =  id2label[t_ids[0]]
                         gold_entities.append({'type':type,'text':text})
                 if R:
                     for t_ids in R:
                         tokens = tmp_input_ids.tolist()[t_ids[1]:t_ids[2]+1]
                         text = tokenizer.decode(tokens)
-                        type =  id2label(t_ids[0])
+                        type =  id2label[t_ids[0]]
                         pred_entities.append({'type':type,'text':text})
                 print(gold_entities)
                 print(pred_entities)

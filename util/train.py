@@ -341,7 +341,7 @@ def valid_epoch_span(e,model, val_loader,device,label_set):
     # # print(report)
     # print('train loss'+str(float(losses)/all_steps))
     eval_info, entity_info = metric.result()
-    # results = {f'{key}': value for key, value in eval_info.items()}
-    # print(results)
+    results = {f'{key}': value for key, value in eval_info.items()}
+    print(results)
 
 

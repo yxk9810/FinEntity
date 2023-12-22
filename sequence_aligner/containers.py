@@ -82,6 +82,6 @@ class SpanTraingingBatch:
             end_ids.append(ex.end_ids)
         self.input_ids = torch.LongTensor(input_ids)
         self.attention_masks = torch.LongTensor(masks)
-        self.start_id = torch.LongTensor(start_ids)
+        self.start_ids = torch.LongTensor(start_ids)
         self.end_ids = torch.LongTensor(end_ids)
 

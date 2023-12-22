@@ -306,8 +306,9 @@ def valid_epoch_span(e,model, val_loader,device,label_set):
             tmp_eval_loss, start_logits, end_logits = outputs[:3]
             R = bert_extract_item(start_logits, end_logits)
             T = extract_item(start_ids,end_ids)
-            # print(R[:2])
-            # print(T[:2])
+            print(R[:2])
+            print(T[:2])
+            
             # sys.exit(1)
             metric.update(true_subject=T, pred_subject=R)
             losses+=tmp_eval_loss.item()

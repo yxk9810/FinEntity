@@ -240,6 +240,8 @@ def train_epoch_span(e, model, data_loader, optimizer, scheduler, device):
             **inputs
         )
         loss = outputs[0]
+        print(len(outputs))
+        print(outputs[0].size())
         losses += loss.item()
         loss.backward()
 

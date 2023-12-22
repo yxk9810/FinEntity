@@ -279,7 +279,7 @@ def extract_item(start_ids,end_ids):
                 T.append((s_l, i, i + j))
                 break
     return T
-def valid_epoch_span(e,model, val_loader,device,label_set):
+def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):
     id2label = {0:'O',1:'Positive',2:'Negative',3:'Neutral'}
     metric = SpanEntityScore(id2label)
 

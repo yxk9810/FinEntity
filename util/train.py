@@ -310,37 +310,37 @@ def valid_epoch_span(e,model, val_loader,device,label_set):
             end_ids = end_ids.cpu().numpy()
             pred_ents = []
             gold_ents = []
-            for tmp_start_logits, tmp_end_logits,start_ids,end_ids in zip(start_logits,end_logits,start_ids,end_ids):
-                print(tmp_start_logits)
-                print(start_ids)
-                print(type(start_ids))
-                print(type(tmp_start_logits))
-                sys.exit(1)
-    #             R = extract_item(start_logits,end_logits)
-    #             T = extract_item(start_ids,end_ids)
-    #             pred_ents.extend(R)
-    #             gold_ents.extend(T)
+            for tmp_start_logits, tmp_end_logits,tmp_start_ids,tmp_end_ids in zip(start_logits,end_logits,start_ids,end_ids):
+                # print(tmp_start_logits)
+                # print(start_ids)
+                # print(type(start_ids))
+                # print(type(tmp_start_logits))
+                # sys.exit(1)
+                R = extract_item(tmp_start_logits.tolist(),tmp_end_logits.tolist())
+                T = extract_item(tmp_start_ids.tolist(),tmp_end_ids.tolist())
+                pred_ents.extend(R)
+                gold_ents.extend(T)
                 
             
-    # #         R = bert_extract_item(start_logits, end_logits)
-    # #         T = extract_item(start_ids,end_ids)
-    # #         print(R[:2])
-    # #         print(T[:2])
+    #         R = bert_extract_item(start_logits, end_logits)
+    #         T = extract_item(start_ids,end_ids)
+    #         print(R[:2])
+    #         print(T[:2])
             
-    # #         # sys.exit(1)
-    #         metric.update(true_subject=gold_ents, pred_subject=pred_ents)
-    # #         losses+=tmp_eval_loss.item()
-    # #         # sub_preds =np.argmax(logits.cpu().numpy(), axis=2).reshape(-1).tolist()
-    # #         # #sub_trues = d["labels"].detach().cpu().numpy().reshape(-1).tolist()
-    # #         # data process
-    # #         #gold_labeled,pred_labeled = ids_to_labels(label_set,sub_trues,sub_preds)
-    # #         #trues.append(gold_labeled)
-    # #         #preds.append(pred_labeled)
-    # #         all_steps+=1
-    # # # report=classification_report(trues, preds, mode='strict', scheme=BILOU)
-    # # # print(report)
-    # # print('train loss'+str(float(losses)/all_steps))
-    # eval_info, entity_info = metric.result()
+    #         # sys.exit(1)
+            metric.update(true_subject=gold_ents, pred_subject=pred_ents)
+    #         losses+=tmp_eval_loss.item()
+    #         # sub_preds =np.argmax(logits.cpu().numpy(), axis=2).reshape(-1).tolist()
+    #         # #sub_trues = d["labels"].detach().cpu().numpy().reshape(-1).tolist()
+    #         # data process
+    #         #gold_labeled,pred_labeled = ids_to_labels(label_set,sub_trues,sub_preds)
+    #         #trues.append(gold_labeled)
+    #         #preds.append(pred_labeled)
+    #         all_steps+=1
+    # # report=classification_report(trues, preds, mode='strict', scheme=BILOU)
+    # # print(report)
+    # print('train loss'+str(float(losses)/all_steps))
+    eval_info, entity_info = metric.result()
     # results = {f'{key}': value for key, value in eval_info.items()}
     # print(results)
 

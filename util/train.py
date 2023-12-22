@@ -233,7 +233,7 @@ def train_epoch_span(e, model, data_loader, optimizer, scheduler, device):
             'input_ids': input_ids.to(device),
             'attention_mask': attention_mask.to(device),
             'start_ids': start_ids.to(device),
-            'start_ids': start_ids.to(device)
+            'end_ids': start_ids.to(device)
 
         }
         outputs = model(

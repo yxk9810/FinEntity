@@ -332,9 +332,12 @@ class TrainingDatasetSpan(Dataset):
                 label_to_ids = {'Positive':1,'Negative':2,'Neutral':3}
 
                 for idx,(s,e,l) in enumerate(zip(start_ids,end_ids,token_labels)):
-                    if 'B-' in self.label_set.ids_to_label[l] or 'U-' in self.label_set.ids_to_label:
+                    if 'B-' in self.label_set.ids_to_label[l]:
                         start_ids[idx] = label_to_ids[self.label_set.ids_to_label[l].split('-')[1]]
                     elif 'L-' in self.label_set.ids_to_label[l]:
+                        end_ids[idx] = label_to_ids[self.label_set.ids_to_label[l].split('-')[1]]
+                    elif 'U-'  in self.label_set.ids_to_label[l]:
+                        start_ids[idx] = label_to_ids[self.label_set.ids_to_label[l].split('-')[1]]
                         end_ids[idx] = label_to_ids[self.label_set.ids_to_label[l].split('-')[1]]
 
 

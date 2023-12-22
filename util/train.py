@@ -18,7 +18,7 @@ from seqeval.metrics import precision_score
 from seqeval.metrics import accuracy_score
 from seqeval.metrics import recall_score
 from seqeval.metrics import classification_report
-from util.process import ids_to_labels,Metrics,Metrics_e
+from util.process import ids_to_labels,Metrics,Metrics_e,SpanEntityScore
 from seqeval.scheme import BILOU
 from util.adversairal import FGM 
 from transformers import BertTokenizerFast

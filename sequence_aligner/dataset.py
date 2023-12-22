@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizerFast
 from typing_extensions import TypedDict
 
-from .containers import TrainingExample,PredictExample
+from .containers import TrainingExample,PredictExample,SpanTrainingExample
 from .labelset import LabelSet
 
 
@@ -275,6 +275,98 @@ class TrainingDataset(Dataset):
     
     def __len__(self):
         return len(self.training_examples)
+
+
+class TrainingDatasetSpan(Dataset):
+    def __init__(
+            self,
+            data: Any,
+            label_set: LabelSet,
+            tokenizer: PreTrainedTokenizerFast,
+            tokens_per_batch=32,
+            window_stride=None,
+            use_span =True
+    ):
+        self.label_set = label_set
+        if window_stride is None:
+            self.window_stride = tokens_per_batch
+        self.tokenizer = tokenizer
+        self.texts = []
+        self.annotations = []
+
+        for example in data:
+            self.texts.append(example["content"])
+            self.annotations.append(example["annotations"])
+        ###TOKENIZE All THE DATA
+        tokenized_batch = self.tokenizer(self.texts, add_special_tokens=False)
+        ###ALIGN LABELS ONE EXAMPLE AT A TIME
+        aligned_labels = []
+        for ix in range(len(tokenized_batch.encodings)):
+            encoding = tokenized_batch.encodings[ix]
+            raw_annotations = self.annotations[ix]
+            aligned = label_set.get_aligned_label_ids_from_annotations(
+                encoding, raw_annotations
+            )
+
+            aligned_labels.append(aligned)
+        ###END OF LABEL ALIGNMENT
+        ###MAKE A LIST OF TRAINING EXAMPLES. (This is where we add padding)
+        self.training_examples: List[SpanTrainingExample] = []
+        empty_label_id = "O"
+        for encoding, label in zip(tokenized_batch.encodings, aligned_labels):
+            length = len(label)  # How long is this sequence
+            for start in range(0, length, self.window_stride):
+                end = min(start + tokens_per_batch, length)
+
+                # How much padding do we need ?
+                padding_to_add = max(0, tokens_per_batch - end + start)
+                # print("padding_to_add",padding_to_add)
+                # print("==",label[start:end])
+                # print( "label:",label[start:end]
+                #                 + [0] * padding_to_add )
+                input_length = len(label[start:end])
+                start_ids = [0]*input_length
+                end_ids = [0]*input_length
+                token_labels = label[start:end]
+
+                label_to_ids = {'Positive':1,'Negative':2,'Netural':3}
+
+                for idx,(s,e,l) in enumerate(zip(start_ids,end_ids,token_labels)):
+                    if 'B-' in self.label_set.ids_to_label[l] or 'U-' in self.label_set.ids_to_label:
+                        start_ids[idx] = label_to_ids[self.label_set.ids_to_label[l].split('-')[1]]
+                    elif 'L-' in self.label_set.ids_to_label[l]:
+                        end_ids[idx] = label_to_ids[self.label_set.ids_to_label[l].split('-')[1]]
+
+
+                self.training_examples.append(
+                    SpanTrainingExample(
+                        # Record the tokens
+                        input_ids=encoding.ids[start:end]  # The ids of the tokens
+                                  + [self.tokenizer.pad_token_id]
+                                  * padding_to_add,  # padding if needed
+                        start_ids=(
+                                start_ids
+                                + [0] * padding_to_add  # padding if needed
+                        ),
+                        end_ids = (
+                                end_ids
+                                + [0] * padding_to_add  # padding if needed
+                        ),
+                        attention_masks=(
+                                encoding.attention_mask[start:end]
+                                + [0]
+                                * padding_to_add  # 0'd attenetion masks where we added padding
+                        ),
+                    )
+                )
+
+    def __len__(self):
+        return len(self.training_examples)
+
+    def __getitem__(self, idx) -> SpanTrainingExample:
+
+        return self.training_examples[idx]
+
 
     def __getitem__(self, idx) -> TrainingExample:
 

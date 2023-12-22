@@ -280,9 +280,13 @@ def extract_item(start_ids,end_ids):
                 break
     return T
 def valid_epoch_span(e,model, val_loader,device,label_set):
+    id2label = {0:'O',1:'Positive',2:'Negative',3:'Neutral'}
+    metric = SpanEntityScore(id2label)
+
     model.eval()
     trues, preds = [], []
     losses = 0
+    all_steps =0 
     with torch.no_grad():
         for step, d in enumerate(val_loader):
             sub_preds, sub_trues = [],[]
@@ -299,14 +303,23 @@ def valid_epoch_span(e,model, val_loader,device,label_set):
             outputs = model(
                 **val_input
             )
-            tmp_eval_loss, start_logits, end_logits = outputs[:3]            
-            sub_preds =np.argmax(logits.cpu().numpy(), axis=2).reshape(-1).tolist()
-            #sub_trues = d["labels"].detach().cpu().numpy().reshape(-1).tolist()
+            tmp_eval_loss, start_logits, end_logits = outputs[:3]
+            R = bert_extract_item(start_logits, end_logits)
+            T = extract_item(start_ids,end_ids)
+            metric.update(true_subject=T, pred_subject=R)
+            losses+=tmp_eval_loss.item()
+            # sub_preds =np.argmax(logits.cpu().numpy(), axis=2).reshape(-1).tolist()
+            # #sub_trues = d["labels"].detach().cpu().numpy().reshape(-1).tolist()
             # data process
             #gold_labeled,pred_labeled = ids_to_labels(label_set,sub_trues,sub_preds)
             #trues.append(gold_labeled)
             #preds.append(pred_labeled)
-    report=classification_report(trues, preds, mode='strict', scheme=BILOU)
-    print(report)
+            all_steps+=1
+    # report=classification_report(trues, preds, mode='strict', scheme=BILOU)
+    # print(report)
+    print('train loss'+str(float(losses)/all_steps))
+    eval_info, entity_info = metric.result()
+    results = {f'{key}': value for key, value in eval_info.items()}
+    print(results)
 
 

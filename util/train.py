@@ -217,3 +217,42 @@ def predict(model, data_loader,device,label_set,tokenizer):
                         
                 y_pred.append(temp)
             return result_entity,result_sentiment
+
+def train_epoch_span(e, model, data_loader, optimizer, scheduler, device):
+    model.train()
+    fgm = FGM(model)
+    losses = 0.0
+    for step, d in enumerate(data_loader):
+        step += 1
+        input_ids = d["input_ids"]
+        attention_mask = d["attention_masks"].type(torch.uint8)
+        start_ids = d["start_ids"]
+        end_ids = d["end_ids"]
+
+        inputs = {
+            'input_ids': input_ids.to(device),
+            'attention_mask': attention_mask.to(device),
+            'start_ids': start_ids.to(device),
+            'start_ids': start_ids.to(device)
+
+        }
+        outputs = model(
+            **inputs
+        )
+        loss = outputs[0]
+        losses += loss.item()
+        loss.backward()
+
+        # fgm
+        fgm.attack()
+        loss_adv = model(**inputs)[0]
+        loss_adv.backward()
+        fgm.restore()
+
+        nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+        optimizer.step()
+        scheduler.step()
+        optimizer.zero_grad()
+    print("Epoch: {}, train Loss:{:.4f}".format((e + 1), losses / step))
+    return losses / step
+

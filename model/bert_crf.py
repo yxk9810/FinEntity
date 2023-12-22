@@ -90,8 +90,8 @@ class BertSoftmaxForSpan(BertPreTrainedModel):
 
             active_start_labels = start_ids.view(-1)[active_loss]
             active_end_labels = end_ids.view(-1)[active_loss]
-            start_loss = self.criterion(active_start_logits, active_start_labels)
-            end_loss = self.criterion(active_end_logits, active_end_labels)
+            start_loss = self.criterion(active_start_logits, active_start_labels).mean()
+            end_loss = self.criterion(active_end_logits, active_end_labels).mean()
             loss = start_loss + end_loss
             outputs = (loss,) + outputs
         return outputs  # (loss), scores, (hidden_states), (attentions)

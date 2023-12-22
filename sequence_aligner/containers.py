@@ -15,7 +15,7 @@ class TrainingExample:
 @dataclass
 class SpanTrainingExample:
     input_ids:IntList
-    attention_mask:IntList
+    attention_masks:IntList
     start_ids:IntList
     end_ids:IntList
 

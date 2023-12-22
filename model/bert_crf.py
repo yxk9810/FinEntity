@@ -80,8 +80,8 @@ class BertSoftmaxForSpan(BertPreTrainedModel):
         end_logits = self.end_fc(sequence_output)
         outputs = (start_logits,end_logits) + outputs[2:]  # add hidden states and attention if they are here
         if start_ids is not None and end_ids is not None :
-            start_logits = start_logits.view(-1, self.num_tags)
-            end_logits = end_logits.view(-1, self.num_tags)
+            start_logits = start_logits.view(-1, 4)
+            end_logits = end_logits.view(-1, 4)
 
             # 去掉 padding 部分的标签，计算真实 loss
             active_loss = attention_mask.view(-1) == 1

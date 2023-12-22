@@ -68,7 +68,7 @@ class BertSoftmaxForSpan(BertPreTrainedModel):
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.start_fc = nn.Linear(config.hidden_size, 4)
         self.end_fc = nn.Linear(config.hidden_size, 4)
-        self.criterion = nn.CrossEntropyLoss()
+        self.criterion = nn.CrossEntropyLoss(reduction='none')
 
         self.init_weights()
 

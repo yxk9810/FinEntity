@@ -306,11 +306,14 @@ def valid_epoch_span(e,model, val_loader,device,label_set):
             tmp_eval_loss, start_logits, end_logits = outputs[:3]
             start_logits = torch.argmax(start_logits, -1).cpu().numpy()
             end_logits =   torch.argmax(end_logits, -1).cpu().numpy()
+            input_ids = input_ids.cpu().numpy()
             start_ids = start_ids.cpu().numpy()
             end_ids = end_ids.cpu().numpy()
             pred_ents = []
             gold_ents = []
-            for tmp_start_logits, tmp_end_logits,tmp_start_ids,tmp_end_ids in zip(start_logits,end_logits,start_ids,end_ids):
+            gold_entities = [] 
+            pred_entities = [] 
+            for tmp_start_logits, tmp_end_logits,tmp_start_ids,tmp_end_ids,tmp_input_ids in zip(start_logits,end_logits,start_ids,end_ids,input_ids):
                 # print(tmp_start_logits)
                 # print(start_ids)
                 # print(type(start_ids))
@@ -320,7 +323,20 @@ def valid_epoch_span(e,model, val_loader,device,label_set):
                 T = extract_item(tmp_start_ids.tolist(),tmp_end_ids.tolist())
                 pred_ents.extend(R)
                 gold_ents.extend(T)
-                
+                if T:
+                    for t_ids in T:
+                        tokens = tmp_input_ids.tolist()[t_ids[1],t_ids[2]+1]
+                        text = tokenizer.decode(tokens)
+                        type =  id2label(t_ids[0])
+                        gold_entities.append({'type':type,'text':text})
+                if R:
+                    for t_ids in R:
+                        tokens = tmp_input_ids.tolist()[t_ids[1],t_ids[2]+1]
+                        text = tokenizer.decode(tokens)
+                        type =  id2label(t_ids[0])
+                        pred_entities.append({'type':type,'text':text})
+                print(gold_entities)
+                print(pred_entities)
             
     #         R = bert_extract_item(start_logits, end_logits)
     #         T = extract_item(start_ids,end_ids)

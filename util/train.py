@@ -270,13 +270,15 @@ def bert_extract_item(start_logits, end_logits):
                 break
     return S
 def extract_item(start_ids,end_ids):
+    import sys 
     T = []
     for i, s_l in enumerate(start_ids):
         if s_l == 0:
             continue
-        for j, e_l in enumerate(end_ids):
+        for j in range(i,len(end_ids)):
+            e_l = end_ids[j]
             if s_l == e_l:
-                T.append((s_l, i, i + j))
+                T.append((s_l, i, j))
                 break
     return T
 def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):

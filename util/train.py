@@ -325,6 +325,7 @@ def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):
                 T = extract_item(tmp_start_ids.tolist(),tmp_end_ids.tolist())
                 print(tmp_start_logits.tolist())
                 print(tmp_end_logits.tolist())
+                sys.exit(1)
                 pred_ents.extend(R)
                 gold_ents.extend(T)
                 if T:

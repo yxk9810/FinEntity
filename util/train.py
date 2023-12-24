@@ -337,8 +337,8 @@ def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):
                         text = tokenizer.decode(tokens)
                         type =  id2label[t_ids[0]]
                         pred_entities.append({'type':type,'text':text})
-                # print(gold_entities)
-                print(pred_entities)
+                print(gold_entities)
+                # print(pred_entities)
             
     #         R = bert_extract_item(start_logits, end_logits)
     #         T = extract_item(start_ids,end_ids)

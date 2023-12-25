@@ -8,10 +8,10 @@ full_fine_tuning = True
 
 # hyper-parameter
 lr = 3e-4
-lr_crf = 3e-5
+lr_crf = 2e-5
 crf_learning_rate = 1e-2 #1e-2 
 eps = 1e-6
-weight_decay = 0.01
+weight_decay = 0.001
 clip_grad = 5
 train_batch_size = 16
 epoch_num = 20

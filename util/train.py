@@ -337,7 +337,13 @@ def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):
                         if text.strip()!='':
                             pred_entities.append({'type':type,'text':text})
                 # print(gold_entities)
-                print(pred_entities[:1])
+
+                golds = set(gold_entities)
+                preds = set(pred_entities)
+                rrecall = (float(len(golds&preds))+1e-9)/(len(golds)+1e-9)
+                precsion = (float(len(golds&preds))+1e-9)/(len(preds)+1e-9)
+                print("recall: {:.2f}, eval Loss:{:.4f}".format(rrecall,precsion))
+                # print(pred_entities[:1])
             
     #         R = bert_extract_item(start_logits, end_logits)
     #         T = extract_item(start_ids,end_ids)

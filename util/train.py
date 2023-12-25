@@ -338,8 +338,8 @@ def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):
                             pred_entities.append({'type':type,'text':text})
                 # print(gold_entities)
 
-                golds = set(gold_entities)
-                preds = set(pred_entities)
+                golds = set([d['text'] for d in gold_entities])
+                preds = set([d['text'] for d in pred_entities])
                 rrecall = (float(len(golds&preds))+1e-9)/(len(golds)+1e-9)
                 precsion = (float(len(golds&preds))+1e-9)/(len(preds)+1e-9)
                 print("recall: {:.2f}, eval Loss:{:.4f}".format(rrecall,precsion))

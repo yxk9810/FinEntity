@@ -323,9 +323,9 @@ def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):
                 # sys.exit(1)
                 R = extract_item(tmp_start_logits.tolist(),tmp_end_logits.tolist())
                 T = extract_item(tmp_start_ids.tolist(),tmp_end_ids.tolist())
-                print(tmp_start_logits.tolist())
-                print(tmp_end_logits.tolist())
-                sys.exit(1)
+                # print(tmp_start_logits.tolist())
+                # print(tmp_end_logits.tolist())
+                # sys.exit(1)
                 pred_ents.extend(R)
                 gold_ents.extend(T)
                 if T:
@@ -337,11 +337,12 @@ def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):
                 if R:
                     for t_ids in R:
                         tokens = tmp_input_ids.tolist()[t_ids[1]:t_ids[2]+1]
-                        text = tokenizer.decode(tokens)
+                        text = tokenizer.decode([tok_id for tok_id in tokens if tok_id!=0])
                         type =  id2label[t_ids[0]]
-                        pred_entities.append({'type':type,'text':text})
-                print(gold_entities)
-                # print(pred_entities)
+                        if text.strip()!='':
+                            pred_entities.append({'type':type,'text':text})
+                # print(gold_entities)
+                print(pred_entities)
             
     #         R = bert_extract_item(start_logits, end_logits)
     #         T = extract_item(start_ids,end_ids)
@@ -363,6 +364,7 @@ def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):
     # print('train loss'+str(float(losses)/all_steps))
     eval_info, entity_info = metric.result()
     results = {f'{key}': value for key, value in eval_info.items()}
+    print("Epoch: {}, eval Loss:{:.4f}".format((e+1), losses/all_steps))
     print(results)
 
 

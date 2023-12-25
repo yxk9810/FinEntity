@@ -358,7 +358,7 @@ def valid_epoch_span(e,model, val_loader,device,label_set,tokenizer):
     #         #gold_labeled,pred_labeled = ids_to_labels(label_set,sub_trues,sub_preds)
     #         #trues.append(gold_labeled)
     #         #preds.append(pred_labeled)
-    #         all_steps+=1
+            all_steps+=1
     # # report=classification_report(trues, preds, mode='strict', scheme=BILOU)
     # # print(report)
     # print('train loss'+str(float(losses)/all_steps))
